@@ -1,3 +1,4 @@
+
 from enum import Enum, auto
 import json
 
@@ -88,6 +89,7 @@ class Token:
     def __repr__(self):
         return str(self)
 
+
     def __eq__(self, other):
         if not isinstance(other, Token):
             return False
@@ -110,16 +112,16 @@ class LexicalAnalyser:
     states = {'q0', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6'}  # define just to clarify group of states in total we are going to have
     alphabets = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '+', '-', '×', '=', '?', 'λ', '≜', '(', ')', ' '}  # just define for the group of alphabets that we are going to include
     # transition = {('q0', [1,2,3,4,5,6,7,8,9]):'q1', ('q0', [0]): 'q2', ('q1', ['.']): 'q3', ('q2', ['.']): 'q3',('q3', [for i in range(10)]):'q3', ('q3', [' ']): 'q4', ('q4', ' '): 'q4',   }
-    transition_0 = {'q0': 'q1', 'q1': 'q6', 'q2': 'q1', 'q3': 'q3', 'q4': 'q4', 'q5': 'q6', 'q6': 'q6'}  # checked
-    transition_1_9 = {'q0': 'q3', 'q1': 'q6', 'q2': 'q3', 'q3': 'q3', 'q4': 'q4', 'q5': 'q6', 'q6': 'q6'}  # checked
-    transition_op = {'q0': 'q5', 'q1': 'q6', 'q2': 'q5', 'q3': 'q6', 'q4': 'q6', 'q5': 'q6', 'q6': 'q6'}  # checked
-    transition_space = {'q0': 'q0', 'q1': 'q0', 'q2': 'q2', 'q3': 'q0', 'q4': 'q0', 'q5': 'q0', 'q6': 'q6'}  # checked
+    # transition_0 = {'q0': 'q1', 'q1': 'q6', 'q2': 'q1', 'q3': 'q3', 'q4': 'q4', 'q5': 'q6', 'q6': 'q6'}  # checked
+    transition_0_9 = {'q0': 'q3', 'q2': 'q3', 'q3': 'q3', 'q4': 'q4', 'q5': 'q6', 'q6': 'q6'}  # checked
+    transition_op = {'q0': 'q5', 'q2': 'q5', 'q3': 'q6', 'q4': 'q6', 'q5': 'q6', 'q6': 'q6'}  # checked
+    transition_space = {'q0': 'q0', 'q2': 'q2', 'q3': 'q0', 'q4': 'q0', 'q5': 'q0', 'q6': 'q6'}  # checked
     # transition_dot = {'q0':'q6', 'q1':'q6','q2':'q8','q3': 'q8', 'q4': 'q7', 'q5':'q7' ,'q6':'q6','q7':'q7', 'q8': 'q6'} #checked
-    transition_a_z_A_Z = {'q0': 'q4', 'q1': 'q6', 'q2': 'q4', 'q3': 'q6', 'q4': 'q4', 'q5': 'q6', 'q6': 'q6'}
-    transition_paren = {'q0': 'q2', 'q1': 'q2', 'q2': 'q2', 'q3': 'q2', 'q4': 'q2', 'q5': 'q2', 'q6': 'q6'}
+    transition_a_z_A_Z = {'q0': 'q4', 'q2': 'q4', 'q3': 'q6', 'q4': 'q4', 'q5': 'q6', 'q6': 'q6'}
+    transition_paren = {'q0': 'q2', 'q2': 'q2', 'q3': 'q2', 'q4': 'q2', 'q5': 'q2', 'q6': 'q6'}
     start_state = 'q0'
-    accepting_state = ['q1', 'q3', 'q4', 'q5', 'q2', 'q0']  # list of accepting state where state of taking final movement should be landed in
-    # error_state = ['q6', 'q7']# list of rejecting state
+    accepting_state = ['q3', 'q4', 'q5', 'q2', 'q0']  # list of accepting state where state of taking final movement should be landed in
+    error_state = 'q6'# list of rejecting state
 
     @classmethod
     def analyse(cls, input):
@@ -127,10 +129,10 @@ class LexicalAnalyser:
         token_list = []
 
         for char in input:
-            if current_state == 'q6':
+            if current_state == cls.error_state:
                 raise ExpressionException(f'Invalid expression,the input is "{input}"')
             if char.isdigit():
-                if char in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                if char in ['0','1', '2', '3', '4', '5', '6', '7', '8', '9']:
                     if current_state in ('q0', 'q2'):
                         
                         token_buffer = Token(char)
@@ -138,18 +140,8 @@ class LexicalAnalyser:
                     else:
                         token_buffer.value += char
                         
-                    current_state = cls.transition_1_9[current_state]
+                    current_state = cls.transition_0_9[current_state]
                     print(token_list)
-                elif char == '0':
-                    if current_state in ('q0', 'q2'):
-                        
-                        token_buffer = Token(char)
-                        token_list.append(token_buffer)
-                    else:
-                        token_buffer.value += char
-                    # print(token_list)
-                    current_state = cls.transition_0[current_state]
-
             # elif char == '.':
             #     numlist += char
             #     prev_state = current_state
@@ -188,7 +180,7 @@ class LexicalAnalyser:
                 # print(token_list)
             else:
                 print(char)
-                current_state = 'q6'
+                current_state = cls.error_state
             # Progress
             # else:
             #     raise NumberException()
@@ -198,18 +190,10 @@ class LexicalAnalyser:
             # if current_state == 'q6':
             #     raise ExpressionException(f'Wrong, the input is "{input}"')
 
-        # Accept or reject the entire string when it end traversing or moving to see which states that the last symbol will end
+        # Accept the string if last symbol will reached
         if current_state in cls.accepting_state:
             return token_list
-        elif current_state in ['q1', 'q3']:
-            raise NumberException(f'Wrong, the input is "{input}"')
-        elif current_state in ['q6', 'q5', 'q2']:
-            raise ExpressionException(f'Wrong, the input is "{input}"')
-        elif current_state == 'q4':
-            raise IdentifierException(f'Wrong, the input is "{input}"')
 
-        # Complete this method.
-        # You will probably need to add more to this class.
 
 
 class LL1():
@@ -235,11 +219,11 @@ class LL1():
         return [int(n.value) if n.type == TokenType.Number else str(n) for n in output]
         
     @classmethod    
-    def parsing_algorithm(cls, input):
-        input = LexicalAnalyser.analyse(input)      
+    def parsing_algorithm(cls, pre_input):
+        input = LexicalAnalyser.analyse(pre_input)      
         stack = []
         # stack.append("$")
-        stack.append("S")
+        stack.append("P")
         empty = False
         input_index = 0
         print(input)
@@ -277,7 +261,7 @@ class LL1():
                 print(stack)
                 print(input_index)
             elif input[input_index].type == TokenType.Rparen:
-                stack.append("wrong number of arguments")
+                stack.append(f"There is no argument between parentheses. Checked parted: {input[0:input_index]}. Error in remaining: {input[input_index:]}")
                 input_index = len(input)
         
         def expr_star():
@@ -292,16 +276,41 @@ class LL1():
                 print(stack)
                 print(input_index)
             else:
-                stack.append("Wrong argument format")
+                stack.append(f"Wrong argument format. Checked parted: {input[0:input_index]}. Error in remaining: {input[input_index:]}")
                 input_index = len(input)
                 
                 
+        def prog():
+            nonlocal input_index
+            print(input[input_index])
+            
+            if input[input_index].type == TokenType.Lparen:
+                stack.append('S')
+                print(stack)
+                print(input_index)
+            elif input[input_index].type == TokenType.Number or input[input_index].type == TokenType.Identifier:
+                stack.append('S')
+                print(stack)
+                print(input_index)
+            elif input[input_index].type == TokenType.Rparen:
+                stack.append(f"Should be left parenthesis, number, or identifier instead of closing parenthesis. Checked parted: {input[0:input_index]}. Error in remaining: {input[input_index:]}")
+                input_index = len(input)
+                print(stack)
                 
+                
+                print(input_index)
+            else:
+                stack.append(f"Wrong argument format. Checked parted: {input[0:input_index]}. Error in remaining: {input[input_index:]}")
+                input_index = len(input)
+                
+                print(stack)
+                print(input_index)
             
         
         def expr():
             nonlocal input_index
             print(input[input_index])
+            
             if input[input_index].type == TokenType.Lparen:
                 stack.append(TokenType.Rparen)
                 stack.append('M')
@@ -313,19 +322,19 @@ class LL1():
                 print(stack)
                 print(input_index)
             elif input[input_index].type == TokenType.Rparen:
-                stack.append("wrong number of arguments")
+                stack.append(f"wrong number of arguments. Checked parted: {input[0:input_index]}. Error in remaining: {input[input_index:]}")
                 input_index = len(input)
                 print(stack)
                 
                 
                 print(input_index)
             else:
-                stack.append("Wrong argument format")
+                stack.append(f"Wrong argument format. Checked parted: {input[0:input_index]}. Error in remaining: {input[input_index:]}")
                 input_index = len(input)
                 
                 print(stack)
                 print(input_index)
-
+        
                 
             # elif input[input_index].type == TokenType.Rparen:
             #     raise Exception("Unmatch paren")
@@ -339,11 +348,17 @@ class LL1():
             if not stack:
                 tok = input[input_index]
                 if tok.type == TokenType.Lparen:
-                    return ("missing closing paren")
+                    return (f"Shouldn't have opening parenthesis for any argument. Checked parted: {input[0:input_index]}. Error in this part: {input[input_index:]}")
                 elif tok.type == TokenType.Rparen:
-                    return ("unmatched paren")
+                    return (f"unmatched paren. Checked parted: {input[0:input_index]}. Error in remaining: {input[input_index:]}")
                 else:
-                    return ("wrong number of arguments")
+                    return (f"wrong number of arguments. Checked parted: {input[0:input_index]}. Error in remaining: {input[input_index:]}")
+            
+            elif stack[-1] == "P":
+                stack.pop()
+                prog()
+                print(stack)
+                print(input_index)
      
             elif stack[-1] == "S":
                 # print(input_index)
@@ -371,11 +386,18 @@ class LL1():
                 print(stack)
                 print(input_index)
             elif isinstance(stack[-1], TokenType) and stack[-1] != input[input_index].type :
-                return("wrong number of arguments")
+                if input[input_index].type == TokenType.Lparen:
+                    return(f"Open another parenthesis instead of finishing old argument. Checked parted: {input[0:input_index]}. Error remaining: {input[input_index:]}")
+                    
+                elif input[input_index].type == TokenType.Rparen:
+                    return(f"Wrong number of arguments. Checked part: {input[0:input_index]}. Error in remaining: {input[input_index:]}")
+                else:
+                    return(f"wrong arguments format. Checked part: {input[0:input_index]}. Error remaining: {input[input_index:]}")
             
             
             
         print(stack)
+        print(input_index)
 
         if input_index == len(input) and not stack:
             new_input = cls.list2json(input)
@@ -383,12 +405,19 @@ class LL1():
             new_input_json = cls.paren2list(new_input)
             print("String accepted")
             return new_input_json
+        # elif len(input) == 0 and stack:
+        #     return("Empty expression")
         elif input_index == len(input) and stack:
             while stack:
                 if isinstance(stack[-1], str):
-                    if stack[-1] in ["S", "M","D"]:
-                        stack.pop()
-                        print(stack)
+                    if stack[-1] == "P":
+                        return("Empty expression")
+                    elif stack[-1] == "S":
+                        return("Wrong number of arguments")
+                    elif stack[-1] == "M":
+                        return("Incomplete argument. Only open parenthesis for the last argument")
+                    elif stack[-1] == "D":
+                        return("Missing closing parenthesis")
                     else:
                         return stack[-1]
                 elif stack[-1] == TokenType.Lparen:
@@ -397,63 +426,12 @@ class LL1():
                     return("Missing closing paren")
                 else:
                     return("unmatch expression")
-
-        
-        
-        
+        #["S", "M","D","P"]
             
 
-    # def paren_expr(self, lookahead, lookahead_index):
-    #     if isinstance(lookahead[lookahead_index], list):
-    #         parsing_algorithm(lookahead[lookahead_index])
-    #     elif lookahead[lookahead_index].type in [TokenType.Plus, TokenType.Minus, TokenType.Mult, TokenType.Equals]:
-    #         stack.push(expr(lookahead, lookahead_index))
-    #         stack.push(expr(lookahead, lookahead_index))
-    #         stack.push(lookahead[lookahead_index].type)
-
-    #     elif lookahead[lookahead_index].type == TokenType.Conditional:
-    #         stack.push(expr(lookahead, lookahead_index))
-    #         stack.push(expr(lookahead, lookahead_index))
-    #         stack.push(expr(lookahead, lookahead_index))
-    #         stack.push(TokenType.Conditional)
-
-    #     elif lookahead.type == TokenType.Lambda:
-    #         stack.push(expr(lookahead, lookahead_index))
-    #         stack.push(expr(lookahead, lookahead_index))
-    #         stack.push(TokenType.Identifier)
-    #         stack.push(TokenType.Lambda)
-
-    #     elif lookahead.type == TokenType.Let:
-    #         stack.push(expr(lookahead, lookahead_index))
-    #         stack.push(expr(lookahead, lookahead_index))
-    #         stack.push(TokenType.Identifier)
-    #         stack.push(TokenType.Let)
-
-    #     elif lookahead.type in [TokenType.Number, TokenType.Identifier]:
-    #         stack.push(expr(lookahead))
-
-    # def expr(self, lookahead, lookahead_index):
-    #     if isinstance(lookahead[lookahead_index], list):
-    #         stack.append(paren_expr(lookahead, lookahead_index))
-    #     elif lookahead[lookahead_index].type == TokenType.Number or lookahead[lookahead_index].type == TokenType.Identifier:
-    #         stack.append(lookahead[lookahead_index].type)
-
-    # def parsing_algorithm(self, token_list):
-    #     token_list_tracker = 0
-    #     stack = []
-    #     stack.append('expr')
-    #     while not token_list_tracker == len(token_list[token_list_tracker]):
-    #         if (stack.peek()) == 'expr':
-    #             expr(token_list, token_list_tracker)
-    #         elif (stack.peek()).type() in TokenType:
-    #             stack.pop()
-    #             token_list_tracker + 1
-    #         elif (stack.peek()) == 'paren_expr':
-    #             paren_expr(token_list[token_list_tracker])
-
-
 def main():
-    test_cases = ['42', 'x  ', '(+ 2 3)', '(× x 5)', '(+ (× 2 3) 4)', '(? (= x 0) 1 0)', '(λ x x)', '(≜ y 10 y)', '((λ x (+ x 1)) 5)', '(+ 2',')  ', '(+ 2 3 4)', "42", "0", "123", "99999", "x", "y", "var", "abc", "XYZ", "longid", "(+ 1 2)", "(− 5 3)", "(× 2 3)", "(= 4 4)", "(+ 12 34)", "(× 9 8)", "(− 10 7)", "(= 99 99)", "(? (= 1 1) 2 3)", "(? (= 2 3) 4 5)", "(λ x x)", "(λ y (+ y 1))", "(λ z (× z z))", "(λ f (λ x (f x)))", "(≜ y 10 y)", "(≜ a 1 (+ a 2))", "(≜ b (λ x (+ x 1)) (b 5))", "((λ x (+ x 1)) 5)", "((λ y (× y y)) 4)", "((λ z (− z 1)) 10)", "(+ (× 2 3) 4)", "(− (× 2 5) (× 3 3))", "(× (+ 2 3) (− 7 2))", "(= (+ 1 2) 3)", "(= (× 2 3) 6)", "(? (= x 0) 1 0)", "(? (= x 1) 2 3)", "(? (= x y) x y)", "(? (= 1 2) 3 4)", "(λ x (+ x 2))", "(λ x (− x 2))", "(λ x (× x 2))", "(λ x (= x 2))", "(≜ id (λ x x) (id 5))", "(≜ const (λ x (λ y x)) ((const 1) 2))", "(≜ inc (λ n (+ n 1)) (inc 10))", "(≜ dbl (λ n (× n 2)) (dbl 7))", "(≜ fact (λ n (? (= n 0) 1 (× n fact (− n 1)))))", "(≜ sq (λ n (× n n)) (sq 9))", "(≜ add (λ a (λ b (+ a b))) ((add 3) 4))", "(≜ f (λ x (+ x 1)) (f (f 5)))", "(≜ f (λ x (× x x)) (f (f 2)))", "((λ f (f 10)) (λ x (+ x 2)))", "((λ f (λ x (f x))) (λ n (+ n 1)))", "((λ f (f 5)) (λ n (+ n 1)))", "(λ a (λ b (+ a b)))", "((λ a (λ b (+ a b))) 3 4)", "((λ a (λ b (+ a b))) 3)", "(+ (+ 1 2) 3)", "(× (× 2 3) 4)", "(= (= 1 1) (= 2 2))", "(+ (λ x x) 3)", "(? (= 1 1) (= 2 2) (= 3 3))", "(? (= 1 2) (+ 2 2) (× 3 3))", "(((λ x (λ y (+ x y))) 2) 3)", "(≜ sum2 (λ a (λ b (+ a b))) (sum2 3 4))", "(≜ sum2 (λ a (λ b (+ a b))) ((sum2 3) 4))", "(≜ a 1 (≜ b 2 (+ a b)))", "(≜ a (≜ b 2 b) a)", "(≜ f (λ x (+ x 1)) (≜ g (λ y (+ y 2)) (g (f 3))))", "(λ x (? (= x 0) 1 (× x x)))", "((λ x (? (= x 0) 1 (× x x))) 5)", "(λ f (λ x (f (f x))))", "((λ f (λ x (f (f x)))) (λ n (+ n 1)))", "((λ f (λ x (f (f (f x))))) (λ n (+ n 1)))", "((λ x (+ x 1)) ((λ x (+ x 1)) 0))", "(+ (× 2 (+ 3 4)) (− 10 1))", "(= (+ 1 2) (+ 3 0))", "(= (× 2 3) (× 1 6))", "(≜ triple (λ n (+ n (+ n n))) (triple 5))", "(? (= x x) (? (= y y) (? (= z z) 1 2) 3) 4)", "((λ x (x x)) (λ x (x x)))", "(≜ omega (λ x (x x)) (omega omega))", "((λ x (λ x (λ x x))) 1 2 3)", "(≜ F (λ fact (λ n (? (= n 0) 1 (× n (fact (− n 1)))))))", "(≜ id (λ x x) (= (id 5) 5))", "(≜ bool (λ x (λ y x)) bool)", "(≜ apply (λ f (λ x (f x))) (apply (λ y (+ y 1)) 3))", "(≜ comp (λ f (λ g (λ x (f (g x))))) ((comp (λ x (+ x 1))) (λ y (× y 2))) 10)", "(≜ church1 (λ f (λ x (f x))))", "(≜ church2 (λ f (λ x (f (f x)))))",]
+    test_cases = ['42', 'x  ', '(+ 2 3)', '(× x 5)', '(+ (× 2 3) 4)', '(? (= x 0) 1 0)', '(λ x x)', '(≜ y 10 y)', '((λ x (+ x 1)) 5)', '(+ 2',')  ', '(+ 2 3 4)', "42", "0", "123", "99999", "x", "y", "var", "abc", "XYZ", "longid", "(+ 1 2)", "(− 5 3)", "(× 2 3)", "(= 4 4)", "(+ 12 34)", "(× 9 8)", "(− 10 7)", "(= 99 99)", "(? (= 1 1) 2 3)", "(? (= 2 3) 4 5)", "(λ x x)", "(λ y (+ y 1))", "(λ z (× z z))", "(λ f (λ x (f x)))", "(≜ y 10 y)", "(≜ a 1 (+ a 2))", "(≜ b (λ x (+ x 1)) (b 5))", "((λ x (+ x 1)) 5)", "((λ y (× y y)) 4)", "((λ z (− z 1)) 10)", "(+ (× 2 3) 4)", "(− (× 2 5) (× 3 3))", "(× (+ 2 3) (− 7 2))", "(= (+ 1 2) 3)", "(= (× 2 3) 6)", "(? (= x 0) 1 0)", "(? (= x 1) 2 3)", "(? (= x y) x y)", "(? (= 1 2) 3 4)", "(λ x (+ x 2))", "(λ x (− x 2))", "(λ x (× x 2))", "(λ x (= x 2))", "(≜ id (λ x x) (id 5))", "(≜ const (λ x (λ y x)) ((const 1) 2))", "(≜ inc (λ n (+ n 1)) (inc 10))", "(≜ dbl (λ n (× n 2)) (dbl 7))", "(≜ fact (λ n (? (= n 0) 1 (× n fact (− n 1)))))", "(≜ sq (λ n (× n n)) (sq 9))", "(≜ add (λ a (λ b (+ a b))) ((add 3) 4))", "(≜ f (λ x (+ x 1)) (f (f 5)))", "(≜ f (λ x (× x x)) (f (f 2)))", "((λ f (f 10)) (λ x (+ x 2)))", "((λ f (λ x (f x))) (λ n (+ n 1)))", "((λ f (f 5)) (λ n (+ n 1)))", "(λ a (λ b (+ a b)))", "((λ a (λ b (+ a b))) 3 4)", "((λ a (λ b (+ a b))) 3)", "(+ (+ 1 2) 3)", "(× (× 2 3) 4)", "(= (= 1 1) (= 2 2))", "(+ (λ x x) 3)", "(? (= 1 1) (= 2 2) (= 3 3))", "(? (= 1 2) (+ 2 2) (× 3 3))", "(((λ x (λ y (+ x y))) 2) 3)", "(≜ sum2 (λ a (λ b (+ a b))) (sum2 3 4))", "(≜ sum2 (λ a (λ b (+ a b))) ((sum2 3) 4))", "(≜ a 1 (≜ b 2 (+ a b)))", "(≜ a (≜ b 2 b) a)", "(≜ f (λ x (+ x 1)) (≜ g (λ y (+ y 2)) (g (f 3))))", "(λ x (? (= x 0) 1 (× x x)))", "((λ x (? (= x 0) 1 (× x x))) 5)", "(λ f (λ x (f (f x))))", "((λ f (λ x (f (f x)))) (λ n (+ n 1)))", "((λ f (λ x (f (f (f x))))) (λ n (+ n 1)))", "((λ x (+ x 1)) ((λ x (+ x 1)) 0))", "(+ (× 2 (+ 3 4)) (− 10 1))", "(= (+ 1 2) (+ 3 0))", "(= (× 2 3) (× 1 6))", "(≜ triple (λ n (+ n (+ n n))) (triple 5))", "(? (= x x) (? (= y y) (? (= z z) 1 2) 3) 4)", "((λ x (x x)) (λ x (x x)))", "(≜ omega (λ x (x x)) (omega omega))", "((λ x (λ x (λ x x))) 1 2 3)", "(≜ F (λ fact (λ n (? (= n 0) 1 (× n (fact (− n 1)))))))", "(≜ id (λ x x) (= (id 5) 5))", "(≜ bool (λ x (λ y x)) bool)", "(≜ apply (λ f (λ x (f x))) (apply (λ y (+ y 1)) 3))", "(≜ comp (λ f (λ g (λ x (f (g x))))) ((comp (λ x (+ x 1))) (λ y (× y 2))) 10)", "(≜ church1 (λ f (λ x (f x))))", "(≜ church2 (λ f (λ x (f (f x)))))", '(+ 2 3  )  (4 5)', '( ( + 1 2 )   (3 4 (' ,'  (λ x x)   5', ')', '(+ 2 3)) )',' (λ x x))  )', '(+ (× 2 3) (  + 4 5))' ,  '(= 1 (  ) )'  , '(? 1 2 (  3))', '(+ 2' , ' (λ x', '(≜ y 10', '(+ 2 )','(? 1 2 )'  , '(≜ x 10 )', '( )' ,'(+ )' , '(× (  ) )',' (λ 1 x)' , '(≜ y ? 10 20)' , '( f  )', '(+ 2 x', '( )', '(+ )', '(λ )', ') 2 3', ')', ') (+ 1 2)', '(+', '(× 1', '(λ x', '(≜ y 10', '((λ x (+ x 1))', '(+ 2 3', '(? (= x 0) 1 0', '( f x y', '(', '((λ x x)', '(+ (× 2 3) 4', '(', '((λ x x)' ,'(+ (× 2 3) 4', "", "    "]
+
     test_cases_results = [LL1.parsing_algorithm(n) for n in test_cases]
     # print(LexicalAnalyser.analyse('(≜ fact (λ n (? (= n 0) 1 (× n fact (− n 1)))))'))
     # print(LexicalAnalyser.analyse('x   '))
@@ -464,7 +442,9 @@ def main():
     # print(LexicalAnalyser.analyse('(λ x x)'))
     # print(LexicalAnalyser.analyse('(≜ y 10 y)'))
     # print(LexicalAnalyser.analyse('((λ x (+ x 1)) 5)'))
-    # print(LL1.parsing_algorithm('(((- 2 3))(+ 2))('))
+    # print(LexicalAnalyser.analyse('(000)'))
+    # print(LexicalAnalyser.analyse('((0000'))
+    # print(LL1.parsing_algorithm('(+ 2 3  )  (4 5) '))
     #(≜ church1 (λ f (λ x (f x))))
     results = dict(zip(test_cases, test_cases_results))
     with open("results.json", "w", encoding='utf-8') as f:
