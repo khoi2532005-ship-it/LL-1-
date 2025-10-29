@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LL(1) Parser :: Theory of Computing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background: #000000;
+            color: #00ff00;
+            line-height: 1.4;
+        }
+
+        /* Classic 2000s repeating background pattern */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.03) 2px,
+                    rgba(255, 255, 255, 0.03) 4px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Classic table layout header */
+        .header {
+            background: #1a1a1a;
+            border: 3px solid #00ff00;
+            margin: 20px;
+            padding: 0;
+        }
+
+        .header-top {
+            background: #00ff00;
+            color: #000000;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 3px solid #00ff00;
+            font-weight: bold;
+        }
+
+        .header-top h1 {
+            font-size: 28px;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+        }
+
+        .header-top marquee {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .navbar {
+            background: #000000;
+            padding: 10px;
+            text-align: center;
+            border-bottom: 2px solid #333;
+        }
+
+        .navbar a {
+            color: #00ff00;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 10px;
+            border: 1px solid #00ff00;
+            background: #1a1a1a;
+        }
+
+        .navbar a:hover {
+            background: #00ff00;
+            color: #000000;
+        }
+
+        /* Blinking text - peak 2000s */
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        .content {
+            margin: 20px;
+        }
+
+        .section {
+            background: #1a1a1a;
+            border: 2px solid #00ff00;
+            margin-bottom: 20px;
+            padding: 0;
+        }
+
+        .section-header {
+            background: #00ff00;
+            color: #000000;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            border-bottom: 2px solid #00ff00;
+        }
+
+        .section-body {
+            padding: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        td {
+            padding: 10px;
+            vertical-align: top;
+        }
+
+        .label {
+            color: #ffffff;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .input-area {
+            width: 100%;
+            min-height: 200px;
+            background: #000000;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .input-area:focus {
+            outline: none;
+            border-color: #ffffff;
+        }
+
+        /* Classic button style */
+        .button {
+            background: #00ff00;
+            color: #000000;
+            border: 3px outset #00ff00;
+            padding: 8px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .button:hover {
+            background: #00cc00;
+        }
+
+        .button:active {
+            border-style: inset;
+        }
+
+        .button:disabled {
+            background: #666666;
+            color: #333333;
+            cursor: not-allowed;
+        }
+
+        .button-group {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        /* Results area with scrollbar */
+        .results-area {
+            background: #000000;
+            border: 2px solid #00ff00;
+            padding: 10px;
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        /* Custom scrollbar - very 2000s */
+        .results-area::-webkit-scrollbar {
+            width: 16px;
+        }
+
+        .results-area::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border: 1px solid #00ff00;
+        }
+
+        .results-area::-webkit-scrollbar-thumb {
+            background: #00ff00;
+            border: 2px solid #000000;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #333333;
+            background: #0a0a0a;
+        }
+
+        .result-item.success {
+            border-left: 5px solid #00ff00;
+        }
+
+        .result-item.error {
+            border-left: 5px solid #ff0000;
+            color: #ff6666;
+        }
+
+        .result-input {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .result-output {
+            color: #00ff00;
+            word-break: break-all;
+        }
+
+        /* Stats table */
+        .stats-table {
+            width: 100%;
+            border: 2px solid #00ff00;
+            margin-top: 15px;
+        }
+
+        .stats-table td {
+            border: 1px solid #00ff00;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00ff00;
+        }
+
+        .stats-label {
+            font-size: 12px;
+            color: #999999;
+        }
+
+        /* Example buttons in grid */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .example-btn {
+            background: #1a1a1a;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .example-btn:hover {
+            background: #00ff00;
+            color: #000000;
+        }
+
+        .example-btn.error-example {
+            border-color: #ff0000;
+            color: #ff6666;
+        }
+
+        .example-btn.error-example:hover {
+            background: #ff0000;
+            color: #000000;
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            border: 2px solid #00ff00;
+            margin: 20px;
+            padding: 15px;
+            text-align: center;
+            color: #666666;
+            font-size: 11px;
+        }
+
+        .footer a {
+            color: #00ff00;
+            text-decoration: none;
+        }
+
+        hr {
+            border: 0;
+            border-top: 2px solid #00ff00;
+            margin: 20px 0;
+        }
+
+        /* Status indicator */
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #000000;
+            border: 1px solid #00ff00;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <h1>☆ LL(1) PARSER ☆</h1>
+                <div>PUSHDOWN AUTOMATON • CONTEXT-FREE GRAMMAR • PYTHON</div>
+                <marquee behavior="scroll" direction="left" scrollamount="3">
+                    Welcome to the LL(1) Parser Web Application :: Powered by A2_Final.py :: Theory of Computing :: Stack-based PDA Implementation :: Parse your expressions now!
+                </marquee>
+            </div>
+            <div class="navbar">
+                <a href="#parse">[ PARSE ]</a>
+                <a href="#examples">[ EXAMPLES ]</a>
+                <a href="#about">[ ABOUT ]</a>
+                <a href="#stats">[ STATS ]</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Connection Status -->
+            <div class="section">
+                <div class="section-header">⚡ CONNECTION STATUS</div>
+                <div class="section-body">
+                    <span class="blink">●</span> Connected to: <strong>A2_Final.py</strong>
+                    <span class="status">READY</span>
+                </div>
+            </div>
+
+            <!-- Input Section -->
+            <div id="parse" class="section">
+                <div class="section-header">► INPUT :: ENTER EXPRESSIONS</div>
+                <div class="section-body">
+                    <table>
+                        <tr>
+                            <td class="label" style="width: 120px;">EXPRESSIONS:</td>
+                            <td>
+                                <textarea 
+                                    id="inputArea" 
+                                    class="input-area"
+                                    placeholder="Enter expressions (one per line)
+
+Example:
+(+ 2 3)
+(λ x (+ x 1))
+(? (= x 0) 1 0)"
+                                ></textarea>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="button-group">
+                        <button class="button" id="parseBtn" onclick="parseInput()">
+                            &gt;&gt; PARSE &lt;&lt;
+                        </button>
+                        <button class="button" onclick="clearAll()">
+                            [ CLEAR ]
+                        </button>
+                        <button class="button" onclick="exportJSON()">
+                            [ EXPORT JSON ]
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="section">
+                <div class="section-header">► OUTPUT :: PARSE RESULTS</div>
+                <div class="section-body">
+                    <div id="results" class="results-area">
+                        <div style="text-align: center; padding: 50px 20px; color: #666666;">
+                            &gt; NO RESULTS YET<br>
+                            &gt; ENTER EXPRESSIONS AND CLICK PARSE
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div id="stats" class="section" style="display: none;">
+                <div class="section-header">► STATISTICS</div>
+                <div class="section-body">
+                    <table class="stats-table">
+                        <tr>
+                            <td>
+                                <div class="stats-number" id="totalCount">0</div>
+                                <div class="stats-label">TOTAL TESTS</div>
+                            </td>
+                            <td>
+                                <div class="stats-number" id="successCount">0</div>
+                                <div class="stats-label">SUCCESSFUL</div>
+                            </td>
+                            <td>
+                                <div class="stats-number" id="errorCount" style="color: #ff0000;">0</div>
+                                <div class="stats-label">ERRORS</div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Examples -->
+            <div id="examples" class="section">
+                <div class="section-header">► EXAMPLES :: CLICK TO TRY</div>
+                <div class="section-body">
+                    <strong>VALID EXPRESSIONS:</strong>
+                    <div class="examples-grid">
+                        <div class="example-btn" onclick="useExample('42')">42</div>
+                        <div class="example-btn" onclick="useExample('x')">x</div>
+                        <div class="example-btn" onclick="useExample('(+ 2 3)')">(+ 2 3)</div>
+                        <div class="example-btn" onclick="useExample('(× x 5)')">(× x 5)</div>
+                        <div class="example-btn" onclick="useExample('(= x 0)')">(= x 0)</div>
+                        <div class="example-btn" onclick="useExample('(? (= x 0) 1 0)')">(? (= x 0) 1 0)</div>
+                        <div class="example-btn" onclick="useExample('(λ x x)')">(λ x x)</div>
+                        <div class="example-btn" onclick="useExample('(≜ y 10 y)')">(≜ y 10 y)</div>
+                        <div class="example-btn" onclick="useExample('(+ (× 2 3) 4)')">NESTED</div>
+                        <div class="example-btn" onclick="useExample('((λ x (+ x 1)) 5)')">FUNCTION</div>
+                    </div>
+
+                    <hr>
+
+                    <strong>ERROR CASES:</strong>
+                    <div class="examples-grid">
+                        <div class="example-btn error-example" onclick="useExample('(+ 2')">MISSING )</div>
+                        <div class="example-btn error-example" onclick="useExample(')')">UNMATCHED )</div>
+                        <div class="example-btn error-example" onclick="useExample('(+ 2 3 4)')">TOO MANY ARGS</div>
+                        <div class="example-btn error-example" onclick="useExample('(+ 2)')">TOO FEW ARGS</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About -->
+            <div id="about" class="section">
+                <div class="section-header">► ABOUT :: TECHNICAL INFO</div>
+                <div class="section-body">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td class="label">PARSER TYPE:</td>
+                            <td>LL(1) - Predictive Top-Down Parser</td>
+                        </tr>
+                        <tr>
+                            <td class="label">AUTOMATON:</td>
+                            <td>Pushdown Automaton (PDA)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">LEXER:</td>
+                            <td>7-State DFA (Deterministic Finite Automaton)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">GRAMMAR:</td>
+                            <td>Context-Free Grammar (CFG)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">LANGUAGE:</td>
+                            <td>Functional (Lambda Calculus + Arithmetic)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">IMPLEMENTATION:</td>
+                            <td>Python 3.8+ (A2_Final.py)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div>
+                ═══════════════════════════════════════════════════════════════
+            </div>
+            <div style="margin: 10px 0;">
+                LL(1) Parser Web Application :: Created 2025 :: 
+                <a href="#">Theory of Computing</a>
+            </div>
+            <div>
+                Best viewed in: ANY BROWSER :: Resolution: 800x600 or higher
+            </div>
+            <div style="margin-top: 10px; font-size: 10px;">
+                [ <a href="#">HOME</a> ] :: [ <a href="#">BACK</a> ] :: [ <a href="#">TOP</a> ]
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let resultsData = {};
+
+        async function parseInput() {
+            const inputArea = document.getElementById('inputArea');
+            const resultsDiv = document.getElementById('results');
+            const statsSection = document.getElementById('stats');
+            const parseBtn = document.getElementById('parseBtn');
+
+            const lines = inputArea.value.split('\n').filter(line => line.trim() !== '');
+
+            if (lines.length === 0) {
+                resultsDiv.innerHTML = '<div style="text-align: center; padding: 50px; color: #666;">&gt; NO INPUT PROVIDED</div>';
+                return;
+            }
+
+            parseBtn.disabled = true;
+            parseBtn.textContent = '[ PROCESSING... ]';
+
+            resultsData = {};
+            let successCount = 0;
+            let errorCount = 0;
+
+            resultsDiv.innerHTML = '<div style="text-align: center; color: #00ff00;">&gt;&gt;&gt; PARSING IN PROGRESS &lt;&lt;&lt;</div>';
+
+            try {
+                const response = await fetch('/parse_batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ expressions: lines })
+                });
+
+                if (!response.ok) {
+                    throw new Error('SERVER ERROR: ' + response.statusText);
+                }
+
+                const data = await response.json();
+                resultsData = data;
+
+                resultsDiv.innerHTML = '';
+
+                for (const [input, result] of Object.entries(data)) {
+                    const isError = !result.success;
+                    const resultItem = document.createElement('div');
+                    resultItem.className = `result-item ${isError ? 'error' : 'success'}`;
+
+                    const displayResult = result.success ? 
+                        JSON.stringify(result.result) : 
+                        (result.error || result.result);
+
+                    resultItem.innerHTML = 
+                        '<div class="result-input">&gt; INPUT: ' + escapeHtml(input) + '</div>' +
+                        '<div class="result-output">&gt; OUTPUT: ' + escapeHtml(displayResult) + '</div>';
+
+                    resultsDiv.appendChild(resultItem);
+
+                    if (isError) errorCount++;
+                    else successCount++;
+                }
+
+                document.getElementById('totalCount').textContent = lines.length;
+                document.getElementById('successCount').textContent = successCount;
+                document.getElementById('errorCount').textContent = errorCount;
+                statsSection.style.display = 'block';
+
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="result-item error">
+                        <div class="result-input">!!! CONNECTION ERROR !!!</div>
+                        <div class="result-output">${escapeHtml(error.message)}</div>
+                        <div style="margin-top: 10px; color: #666;">
+                            Make sure Flask server is running:<br>
+                            &gt; python app.py
+                        </div>
+                    </div>
+                `;
+            } finally {
+                parseBtn.disabled = false;
+                parseBtn.textContent = '>> PARSE <<';
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputArea').value = '';
+            document.getElementById('results').innerHTML = 
+                '<div style="text-align: center; padding: 50px; color: #666;">&gt; NO RESULTS YET<br>&gt; ENTER EXPRESSIONS AND CLICK PARSE</div>';
+            document.getElementById('stats').style.display = 'none';
+            resultsData = {};
+        }
+
+        function exportJSON() {
+            if (Object.keys(resultsData).length === 0) {
+                alert('NO DATA TO EXPORT\n\nPlease parse some expressions first.');
+                return;
+            }
+
+            const dataStr = JSON.stringify(resultsData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'parser_results.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function useExample(example) {
+            document.getElementById('inputArea').value = example;
+            document.getElementById('inputArea').focus();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Add visitor counter effect
+        window.onload = function() {
+            console.log('%c LL(1) PARSER SYSTEM INITIALIZED ', 'background: #00ff00; color: #000000; font-size: 16px; font-family: monospace;');
+        }
+    </script>
+</body>
+</html>

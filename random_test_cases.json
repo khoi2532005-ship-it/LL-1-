@@ -1,0 +1,302 @@
+[
+    {
+        "input": "(≜)",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    },
+    {
+        "input": ")))",
+        "type": "error",
+        "description": "Unmatched parenthesis"
+    },
+    {
+        "input": "(+ (? c n 784) z",
+        "type": "error",
+        "description": "Missing closing parenthesis"
+    },
+    {
+        "input": "(? (λ y sum) z (≜ x (λ val y) (? 586 624 (λ c a))))",
+        "type": "valid",
+        "description": "Valid expression 26"
+    },
+    {
+        "input": "(?)",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    },
+    {
+        "input": "(≜ a val (λ n n)",
+        "type": "error",
+        "description": "Missing closing parenthesis"
+    },
+    {
+        "input": "(? x (? 954 x 100) (≜ sum (≜ val (= a 982) 273) (≜ z (? 972 74 f) x)))",
+        "type": "valid",
+        "description": "Valid expression 3"
+    },
+    {
+        "input": "(= x z 343 (λ val b))",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    },
+    {
+        "input": "(≜ c 565 583)",
+        "type": "valid",
+        "description": "Valid expression 14"
+    },
+    {
+        "input": "(λ)",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    },
+    {
+        "input": "22",
+        "type": "valid",
+        "description": "Valid expression 21"
+    },
+    {
+        "input": "y",
+        "type": "valid",
+        "description": "Valid expression 18"
+    },
+    {
+        "input": "(≜ val (≜ val 736 (? (λ y 310) (= 764 a) 134)) 815)",
+        "type": "valid",
+        "description": "Valid expression 6"
+    },
+    {
+        "input": "(+ (? c 430 569) (+ 89 831) y (× b sum))",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    },
+    {
+        "input": "116",
+        "type": "valid",
+        "description": "Valid expression 30"
+    },
+    {
+        "input": "914",
+        "type": "valid",
+        "description": "Valid expression 2"
+    },
+    {
+        "input": ")490",
+        "type": "error",
+        "description": "Unmatched parenthesis"
+    },
+    {
+        "input": "(= (+ 730 (− 140 201)) (λ sum (≜ f a y)))",
+        "type": "valid",
+        "description": "Valid expression 29"
+    },
+    {
+        "input": "(≜ val x 798)",
+        "type": "valid",
+        "description": "Valid expression 8"
+    },
+    {
+        "input": "y",
+        "type": "valid",
+        "description": "Valid expression 20"
+    },
+    {
+        "input": "718",
+        "type": "valid",
+        "description": "Valid expression 12"
+    },
+    {
+        "input": "(? (λ b 389) (≜ a 225 (≜ b z 361)) sum)",
+        "type": "valid",
+        "description": "Valid expression 15"
+    },
+    {
+        "input": "(≜ x (≜ x (? (? sum n b) n (λ sum x)) (? a (− y n) (λ n n))) (λ n (λ n (λ a 164))))",
+        "type": "valid",
+        "description": "Valid expression 1"
+    },
+    {
+        "input": "(? z (+ a sum) (= y f))",
+        "type": "valid",
+        "description": "Valid expression 16"
+    },
+    {
+        "input": "613",
+        "type": "valid",
+        "description": "Valid expression 25"
+    },
+    {
+        "input": ") b",
+        "type": "error",
+        "description": "Unmatched parenthesis"
+    },
+    {
+        "input": "(λ sum x)",
+        "type": "valid",
+        "description": "Valid expression 17"
+    },
+    {
+        "input": ")(λ b a)(",
+        "type": "error",
+        "description": "Unmatched parenthesis"
+    },
+    {
+        "input": "(? 863)",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    },
+    {
+        "input": "(× (− a 777))",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    },
+    {
+        "input": "(+ 2 3",
+        "type": "error",
+        "description": "Missing closing parenthesis"
+    },
+    {
+        "input": "(+ 2 3",
+        "type": "error",
+        "description": "Missing closing parenthesis"
+    },
+    {
+        "input": "))",
+        "type": "error",
+        "description": "Unmatched parenthesis"
+    },
+    {
+        "input": "(+ sum x)",
+        "type": "valid",
+        "description": "Valid expression 13"
+    },
+    {
+        "input": "(? (+ (= b (× z c)) sum) (+ (? (≜ y 664 n) (? 499 n 1) 372) (≜ z 291 (λ a b))) (λ b z))",
+        "type": "valid",
+        "description": "Valid expression 28"
+    },
+    {
+        "input": ") x",
+        "type": "error",
+        "description": "Unmatched parenthesis"
+    },
+    {
+        "input": ")910",
+        "type": "error",
+        "description": "Unmatched parenthesis"
+    },
+    {
+        "input": "(λ f 591",
+        "type": "error",
+        "description": "Missing closing parenthesis"
+    },
+    {
+        "input": "(≜ f)",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    },
+    {
+        "input": "(? 929 252 781)",
+        "type": "valid",
+        "description": "Valid expression 11"
+    },
+    {
+        "input": "z",
+        "type": "valid",
+        "description": "Valid expression 24"
+    },
+    {
+        "input": "n",
+        "type": "valid",
+        "description": "Valid expression 10"
+    },
+    {
+        "input": "(+ 2 3",
+        "type": "error",
+        "description": "Missing closing parenthesis"
+    },
+    {
+        "input": "(λ n (? (? 128 566 n) (+ x c) (≜ y y 183)))",
+        "type": "valid",
+        "description": "Valid expression 4"
+    },
+    {
+        "input": "(− a c)",
+        "type": "valid",
+        "description": "Valid expression 19"
+    },
+    {
+        "input": "(+ (≜ y (? 33 965 863) 157) n)",
+        "type": "valid",
+        "description": "Valid expression 5"
+    },
+    {
+        "input": "))",
+        "type": "error",
+        "description": "Unmatched parenthesis"
+    },
+    {
+        "input": "(≜ z (× (≜ b a 871) (? 396 val 591)) (λ z (+ 105 520)))",
+        "type": "valid",
+        "description": "Valid expression 27"
+    },
+    {
+        "input": "(≜ z (≜ x val x) (≜ sum 788 x)",
+        "type": "error",
+        "description": "Missing closing parenthesis"
+    },
+    {
+        "input": "(≜ z)",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    },
+    {
+        "input": "(− val (≜ b c 778) 920 516)",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    },
+    {
+        "input": "val",
+        "type": "valid",
+        "description": "Valid expression 23"
+    },
+    {
+        "input": ") b",
+        "type": "error",
+        "description": "Unmatched parenthesis"
+    },
+    {
+        "input": ") sum",
+        "type": "error",
+        "description": "Unmatched parenthesis"
+    },
+    {
+        "input": "(× (≜ val (? (λ y 250) (? 294 943 f) (? b 948 835)) c) (λ b (≜ z (λ c 967) 206)))",
+        "type": "valid",
+        "description": "Valid expression 9"
+    },
+    {
+        "input": "(≜ a 579)",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    },
+    {
+        "input": "(+ 701 551)",
+        "type": "valid",
+        "description": "Valid expression 22"
+    },
+    {
+        "input": "(+ 2 3",
+        "type": "error",
+        "description": "Missing closing parenthesis"
+    },
+    {
+        "input": "(λ b z)",
+        "type": "valid",
+        "description": "Valid expression 7"
+    },
+    {
+        "input": "(λ y)",
+        "type": "error",
+        "description": "Wrong number of arguments"
+    }
+]
